@@ -2,336 +2,120 @@
 <html>
 <head>
   <meta charset="utf-8">
-  <title>Promises/A+</title>
+  <title>promises</title>
   <link rel="stylesheet" href="assets/stylesheet.css">
-  <link rel="shortcut icon" href="assets/favicon.ico">
 </head>
 
 <body class="spec">
-  <h1 id="promisesa">Promises/A+</h1>
+ Promises/A+
+ 一个开放、健全、通用的 JavaScript Promise 标准——由开发者制定，供开发者参考
 
-  <p id="point-1"><a href="#point-1" class="anchor"></a><strong>一个开放、健全、通用的 JavaScript Promise 标准——由开发者制定，供开发者参考</strong>
-  </p>
+ 一个 promise 代表异步操作的最终结果。 和一个promise交互的主要方法是通过它的 then 方法,它注册了回调函数来接收 promise 的最终value 和 不能被 fulfilled 的reason。
 
-  <p id="point-2"><a href="#point-2" class="anchor"></a>一个 <em>promise</em> 代表异步操作的最终结果。 和一个promise交互的主要方法是通过它的 <code
-      class="highlighter-rouge">then</code> 方法,它注册了回调函数来接收 promise 的最终value 和 不能被 fulfilled 的reason。
-  </p>
+ 此规范详细说明了 then 方法的行为, 所有符合Promises/A+规范的 promise实现，都可以依靠提供的基础进行操作。因此，这个规范是非常稳定的。 尽管Promises/A+组织
+ 会不定期采用向下兼容的方式做一些微调，来修订次规范， 去改变最新发现的边界情况。我们只有在仔细的考虑, 讨论和测试之后才会做一些大的修改或者向后不兼容的改变。
 
-  <p id="point-3"><a href="#point-3" class="anchor"></a>此规范详细说明了 <code
-      class="highlighter-rouge">then</code> 方法的行为, 所有符合Promises/A+规范的
-    promise实现，都可以依靠提供的基础进行操作。因此，这个规范是非常稳定的。
-    尽管Promises/A+组织 会不定期采用向下兼容的方式做一些微调，来修订次规范，
-    去改变最新发现的边界情况。我们只有在仔细的考虑, 讨论和测试之后才会做一些大的修改或者向后不兼容的改变。
-  </p>
+ 在历史上, Promises/A+ 只是把 早期的 Promises/A 提议的行为条款阐明, 并扩展它覆盖 事实上的所有行为，并省略了一些不足和不确定的部分.
 
-  <p id="point-4"><a href="#point-4" class="anchor"></a>在历史上, Promises/A+ 只是把 
-    早期的 <a href="http://wiki.commonjs.org/wiki/Promises/A">Promises/A 提议</a>的行为条款阐明, 并扩展它覆盖 <em>事实上的</em>所有行为，并省略了一些不足和不确定的部分.</p>
+ 最终, 这个核心的 Promises/A+ 规范 不能处理 如何去创建fulfill, 或reject promises, 反而决定去集中于提供一个可共同操作的then 方法。 未来在指南规范中可能提及这些主题。
 
-  <p id="point-5"><a href="#point-5" class="anchor"></a>最终, 这个核心的 Promises/A+ 规范 不能处理
-    如何去创建fulfill, 或reject promises, 反而决定去集中于提供一个可共同操作的<code
-      class="highlighter-rouge">then</code> 方法。 未来在指南规范中可能提及这些主题。
-  </p>
+ 术语
+ “promise” 是一个具有符合此规范的then 方法的对象或者函数
+ “thenable” 是一个对象或者函数，并附带着一个 then 方法
+ “value” 是一个任意合法的javaScript值（包括including undefined,thenable 或 promise).
+ “exception” 是一个用 throw 语句抛出的值
+ “reason” 是一个表明promise被rejected的原因的值
+ 要求
+ Promise 状态
+ 一个promise必须是这三种状态中的一种: pending, fulfilled, 或rejected.
 
-  <h2 id="terminology"><a href="#terminology" class="anchor"></a>术语</h2>
+ 当状态为pending时, 这个promise:
+ 可能会变成 fulfilled 或者 rejected 状态。
+ 当状态为fulfilled, 这个promise:
+ 不可以转变为其他任意一种状态
+ 必须有个value，并且不可改变
+ 当状态为rejected时, 这个promise:
+ 不可以转变为其他任意一种状态
+ 必须有一个reason, 并且不可改变。
+ 在这里, “不可改变” 意思是不可改变的身份 (i.e. ===), 并不意味着深层次的不可改变。
 
-  <ol>
-    <li id="point-6"><a href="#point-6" class="anchor"></a>“promise” 是一个具有符合此规范的<code
-        class="highlighter-rouge">then</code> 方法的对象或者函数</li>
-    <li id="point-7"><a href="#point-7" class="anchor"></a>“thenable” 是一个对象或者函数，并附带着一个 <code
-        class="highlighter-rouge">then</code> 方法</li>
-    <li id="point-8"><a href="#point-8" class="anchor"></a>“value” 是一个任意合法的javaScript值（包括including <code
-        class="highlighter-rouge">undefined</code>,thenable 或 promise).</li>
-    <li id="point-9"><a href="#point-9" class="anchor"></a>“exception” 是一个用 <code
-        class="highlighter-rouge">throw</code> 语句抛出的值</li>
-    <li id="point-10"><a href="#point-10" class="anchor"></a>“reason” 是一个表明promise被rejected的原因的值</li>
-  </ol>
+ then 方法
+ 每个promise必须提供一个 then 方法接收当前的或者最终的value或reason；
 
-  <h2 id="requirements"><a href="#requirements" class="anchor"></a>要求</h2>
+ 每个promise的 then 方法接受两个参数
 
-  <h3 id="promise-states"><a href="#promise-states" class="anchor"></a>Promise 状态</h3>
+ promise.then(onFulfilled, onRejected)
+ onFulfilled 和 onRejected 都是可选参数:
+ 如果 onFulfilled 不是一个函数, 它应该被忽略。
+ 如果onRejected is 不是一个函数, 它应该被忽略。
+ 如果onFulfilled 是一个函数:
+ 它必须在 promise 状态为fulfilled时被调用, 并且 promise的vallue值是它的第一个参数
+ 它在 promise 状态转变为fulfilled前不可以被调用。
+ 它只可以被调用一次
+ 如果 onRejected 是一个函数,
+ 它必须在 promise 状态为rejected时被调用, 并且 promise的reason值是它的第一个参数
+ 它在 promise 状态转为rejected前不可以被调用。
+ 它只可以被调用一次。
+ onFulfilled或onRejected 不可以被调用,直到执行上下文 栈只包含平台代码。 [3.1].
+ onFulfilled 和 onRejected 必须作为一个函数来调用 (i.e.即没有 this ). [3.2]
+ 同一个promisethen 可能被调用多次。
+ 当 promise 状态是fulfilled时, 所有的onFulfilled 回调函数必须按照它们创建的顺序，交给各自的then来调用
+ 当promise 状态是rejected时,所有的 onRejected 回调函数必须按照它们创建的顺序，交给各自的 then来调用
+ then 必须返回一个 promise [3.3].
 
-  <p id="point-11"><a href="#point-11" class="anchor"></a>一个promise必须是这三种状态中的一种: pending, fulfilled,
-    或rejected.</p>
+ promise2 = promise1.then(onFulfilled, onRejected);
+ 如果 onFulfilled 或onRejected 返回了一个 x值, 运行下面的代码解决过程： [[Resolve]](promise2, x)。
+ 如果 onFulfilled 或 onRejected 抛出一个 异常 e, promise2 状态一定是 rejected ，并且 e 就是reason.
+ 如果 onFulfilled 不是一个函数，并且 promise1 状态是fulfilled， promise2 状态一定是fulfilled ，并且有一个与 promise1相同的 value。
+ 如果 onRejected不是一个函数，并且promise1的状态是rejected, promise2 状态一定是rejected,并且有一个与 promise1相同的 reason。
+ The Promise 解决过程
+ promise 解决过程 是一个抽象的运算所得， 比如我们这样 [[Resolve]](promise, x)，表示输入一个promise和一个值，如果 x 是一个 thenable, 或者说假设这个 x
+ 看起来有点像一个promise，它会试图使 promise 采取 x的状态, 否则, 它会转变 promise的状态为fulfilled并以 x作为value。
 
-  <ol>
-    <li id="point-12"><a href="#point-12" class="anchor"></a>当状态为pending时, 这个promise:
-      <ol>
-        <li id="point-13"><a href="#point-13" class="anchor"></a>可能会变成 fulfilled 或者 rejected
-          状态。</li>
-      </ol>
-    </li>
-    <li id="point-14"><a href="#point-14" class="anchor"></a>当状态为fulfilled, 这个promise:
-      <ol>
-        <li id="point-15"><a href="#point-15" class="anchor"></a>不可以转变为其他任意一种状态</li>
-        <li id="point-16"><a href="#point-16" class="anchor"></a>必须有个value，并且不可改变</li>
-      </ol>
-    </li>
-    <li id="point-17"><a href="#point-17" class="anchor"></a>当状态为rejected时, 这个promise:
-      <ol>
-        <li id="point-18"><a href="#point-18" class="anchor"></a>不可以转变为其他任意一种状态</li>
-        <li id="point-19"><a href="#point-19" class="anchor"></a>必须有一个reason, 并且不可改变。</li>
-      </ol>
-    </li>
-  </ol>
+ 这种对thenables的处理使promise的实现更具有可操作性, 只要它们暴露一个Promises/A+应允的then 方法，它也允许符合Promises/A+的实现与那些具有合理 then 方法，但不符合规范的实现共存
 
-  <p id="point-20"><a href="#point-20" class="anchor"></a>在这里, “不可改变” 意思是不可改变的身份 (i.e. <code
-      class="highlighter-rouge">===</code>), 并不意味着深层次的不可改变。</p>
+ 运行 [[Resolve]](promise, x), 会执行以下步骤:
 
-  <h3 id="the-then-method"><a href="#the-then-method" class="anchor"></a> <code class="highlighter-rouge">then</code>
-    方法</h3>
+ 如果promise 和x 指向同一个object, rejectpromise,并抛出一个TypeError作为reason.
+ 如果 x 是一个promise, 采取它的状态[3.4]:
+ 如果 x 的状态是pending, promise 保持 pending状态，直到 x 状态转变为 fulfilled 或 rejected.
+ 如果 x 状态为 fulfilled, fulfill promise,给一个相同的value.
+ 如果 x 状态为 rejected, reject promise ,给一个相同的reason.
+ 另外, 如果x 是一个对象或者函数,
+ 把 x.then 作为then [3.5]
+ 如果在x.then 取值过程中抛出一个异常e e, rejectpromise,并把e 作为reason。
+ 如果 then 是一个函数, 用x调用它，并把 x as this指向x,并且接收两个参数，第一个参数是 resolvePromise, 第二个参数是 rejectPromise, 这里:
+ 如果 resolvePromise 被一个valuey调用, 运行[[Resolve]](promise, y).
+ 如果 rejectPromise 被一个reason r调用, reject promise ,并以 r作为reason.
+ 如果 resolvePromise 和rejectPromise 都被调用, 或者被相同的参数多次调用, 采取第一次调用的结果,忽略之后的调用。
+ 如果调用then 的时候抛出一个异常e,
+ 如果 resolvePromise 或者 rejectPromise 已经被调用, 忽略这个异常。
+ 否则， rejectpromise, 并把 e作为 reason.
+ 如果then 不是一个函数， resolvepromise ,并把 x作为value。
+ 如果 x 既不是一个对象也不是一个函数, fulfill promise ,并把 x作为value。
+ 如果一个promise被一个参与了循环的thenable链的thenable,resolved , 这样 [[Resolve]](promise, thenable) 的递归本质会使[[Resolve]](promise,
+ thenable) 再次被调用, 遵循以上的算法会导致无限递归. 我们鼓励但不强制实现, 去检测在出现这种无限递归时,用一个 TypeError 作为reason去reject promise[3.6]
 
-  <p id="point-21"><a href="#point-21" class="anchor"></a>每个promise必须提供一个 <code
-      class="highlighter-rouge">then</code> 方法接收当前的或者最终的value或reason；</p>
+ 注释
+ 这里 “平台代码” 是指 引擎, 环境, 和 promise 实现代码. 在实践中, 需要保证 onFulfilled 和 onRejected是异步执行的 , 并且应该在then 被调用的那一轮事件环结束后, 采用一个新的栈来调用，
+ 可以采用宏任务（’macro-task‘）机制如 setTimeout 、setImmediate, 或者微任务（“micro-task” ）机制如 MutationObserver 、process.nextTick来实现。 由于
+ promise 的实现被认为是 平台代码, 它处理程序时可能本身包含一个任务队列 或者 “trampoline”。
 
-  <p id="point-22"><a href="#point-22" class="anchor"></a>每个promise的 <code class="highlighter-rouge">then</code> 方法接受两个参数</p>
+ 也就是说, 在严格模式下 this 是 undefined; 非严格模式下, this指向全局对象。
 
-  <div class="language-js highlighter-rouge">
-    <div class="highlight">
-      <pre class="highlight"><code><span class="nx">promise</span><span class="p">.</span><span class="nx">then</span><span class="p">(</span><span class="nx">onFulfilled</span><span class="p">,</span> <span class="nx">onRejected</span><span class="p">)</span>
-</code></pre>
-    </div>
-  </div>
+ 在实现满足所有要求的情况下，可以允许 promise2 === promise1, 每一种实现都应该记录是否可以让 promise2 === promise1 ，以及什么情况下等式成立。
 
-  <ol>
-    <li id="point-23"><a href="#point-23" class="anchor"></a><code class="highlighter-rouge">onFulfilled</code> 和
-      <code class="highlighter-rouge">onRejected</code> 都是可选参数:
-      <ol>
-        <li id="point-24"><a href="#point-24" class="anchor"></a>如果 <code class="highlighter-rouge">onFulfilled</code>
-          不是一个函数, 它应该被忽略。</li>
-        <li id="point-25"><a href="#point-25" class="anchor"></a>如果<code class="highlighter-rouge">onRejected</code> is
-          不是一个函数, 它应该被忽略。</li>
-      </ol>
-    </li>
-    <li id="point-26"><a href="#point-26" class="anchor"></a>如果<code class="highlighter-rouge">onFulfilled</code> 是一个函数:
-      <ol>
-        <li id="point-27"><a href="#point-27" class="anchor"></a>它必须在 <code
-            class="highlighter-rouge">promise</code> 状态为fulfilled时被调用, 并且 <code
-              class="highlighter-rouge">promise</code>的vallue值是它的第一个参数</li>
-        <li id="point-28"><a href="#point-28" class="anchor"></a>它在 <code
-            class="highlighter-rouge">promise</code> 状态转变为fulfilled前不可以被调用。</li>
-        <li id="point-29"><a href="#point-29" class="anchor"></a>它只可以被调用一次</li>
-      </ol>
-    </li>
-    <li id="point-30"><a href="#point-30" class="anchor"></a>如果 <code class="highlighter-rouge">onRejected</code> 是一个函数,
-      <ol>
-        <li id="point-31"><a href="#point-31" class="anchor"></a>它必须在 <code
-            class="highlighter-rouge">promise</code> 状态为rejected时被调用, 并且 <code class="highlighter-rouge">promise</code>的reason值是它的第一个参数</li>
-        <li id="point-32"><a href="#point-32" class="anchor"></a>它在 <code
-            class="highlighter-rouge">promise</code> 状态转为rejected前不可以被调用。</li>
-        <li id="point-33"><a href="#point-33" class="anchor"></a>它只可以被调用一次。</li>
-      </ol>
-    </li>
-    <li id="point-34"><a href="#point-34" class="anchor"></a><code class="highlighter-rouge">onFulfilled</code>或<code
-        class="highlighter-rouge">onRejected</code> 不可以被调用,直到<a
-        href="https://es5.github.io/#x10.3">执行上下文</a> 栈只包含平台代码。 [<a
-        href="#notes">3.1</a>].</li>
-    <li id="point-35"><a href="#point-35" class="anchor"></a><code class="highlighter-rouge">onFulfilled</code> 和
-      <code class="highlighter-rouge">onRejected</code> 必须作为一个函数来调用 (i.e.即没有 <code
-        class="highlighter-rouge">this</code> ). [<a href="#notes">3.2</a>]</li>
-    <li id="point-36"><a href="#point-36" class="anchor"></a>同一个promise<code class="highlighter-rouge">then</code> 可能被调用多次。
-      <ol>
-        <li id="point-37"><a href="#point-37" class="anchor"></a>当 <code class="highlighter-rouge">promise</code>
-        状态是fulfilled时, 所有的<code
-            class="highlighter-rouge">onFulfilled</code> 回调函数必须按照它们创建的顺序，交给各自的<code class="highlighter-rouge">then</code>来调用
-        </li>
-        <li id="point-38"><a href="#point-38" class="anchor"></a>当<code class="highlighter-rouge">promise</code>
-          状态是rejected时,所有的 <code class="highlighter-rouge">onRejected</code> 回调函数必须按照它们创建的顺序，交给各自的
-          <code class="highlighter-rouge">then</code>来调用</li>
-      </ol>
-    </li>
-    <li id="point-39"><a href="#point-39" class="anchor"></a>
-      <p id="point-40"><a href="#point-40" class="anchor"></a><code class="highlighter-rouge">then</code> 必须返回一个
-        promise [<a href="#notes">3.3</a>].</p>
+ 一般来说，只有x符合当前实现,我们才认为它是一个真正的 x 。这个条款允许具体实现的时候可以采用一个符合规范的promise的状态。
 
-      <div class="language-js highlighter-rouge">
-        <div class="highlight">
-          <pre class="highlight"><code> <span class="nx">promise2</span> <span class="o">=</span> <span class="nx">promise1</span><span class="p">.</span><span class="nx">then</span><span class="p">(</span><span class="nx">onFulfilled</span><span class="p">,</span> <span class="nx">onRejected</span><span class="p">);</span>
-</code></pre>
-        </div>
-      </div>
+ 程序会首先 存储的一个 x.then的引用地址, 然后测试这个引用, 然后调用这个引用, 避免多次调用x.then 属性。这种防范 对确保值的一致性非常重要，因为在面对一个存储器属性时, 在取值的时候值可能发生改变
 
-      <ol>
-        <li id="point-41"><a href="#point-41" class="anchor"></a>如果 <code
-            class="highlighter-rouge">onFulfilled</code> 或<code class="highlighter-rouge">onRejected</code> 返回了一个
-          <code class="highlighter-rouge">x</code>值, 运行下面的代码解决过程： <code
-            class="highlighter-rouge">[[Resolve]](promise2, x)</code>。</li>
-        <li id="point-42"><a href="#point-42" class="anchor"></a>如果 <code
-            class="highlighter-rouge">onFulfilled</code> 或 <code class="highlighter-rouge">onRejected</code> 抛出一个
-          异常 <code class="highlighter-rouge">e</code>, <code class="highlighter-rouge">promise2</code> 状态一定是
-          rejected ，并且 <code class="highlighter-rouge">e</code> 就是reason.</li>
-        <li id="point-43"><a href="#point-43" class="anchor"></a>如果 <code class="highlighter-rouge">onFulfilled</code>
-          不是一个函数，并且 <code class="highlighter-rouge">promise1</code> 状态是fulfilled， <code
-            class="highlighter-rouge">promise2</code> 状态一定是fulfilled ，并且有一个与 <code
-            class="highlighter-rouge">promise1</code>相同的 value。</li>
-        <li id="point-44"><a href="#point-44" class="anchor"></a>如果 <code class="highlighter-rouge">onRejected</code>不是一个函数，并且<code class="highlighter-rouge">promise1</code>的状态是rejected, <code
-            class="highlighter-rouge">promise2</code> 状态一定是rejected,并且有一个与 <code
-            class="highlighter-rouge">promise1</code>相同的 reason。</li>
-      </ol>
-    </li>
-  </ol>
+ 实现不需要专门针对深度的tenable链做限制, 假定超出了这个限制的递归就是无限的。 只有真正的循环引用才会导致 TypeError; 如果一个无限的链上的 thenables都互不相同, 递归永远是正确的行为。
 
-  <h3 id="the-promise-resolution-procedure"><a href="#the-promise-resolution-procedure" class="anchor"></a>The Promise
-    解决过程</h3>
+ CC0
+ To the extent possible under law, the Promises/A+ organization has waived all copyright and related or neighboring
+ rights to Promises/A+ Promise Specification. This work is published from: United States.
 
-  <p id="point-45"><a href="#point-45" class="anchor"></a><strong>promise 解决过程</strong> 是一个抽象的运算所得，
-    比如我们这样 <code
-      class="highlighter-rouge">[[Resolve]](promise, x)，表示输入一个promise和一个值</code>，如果 <code
-        class="highlighter-rouge">x</code> 是一个
-    thenable, 或者说假设这个 <code class="highlighter-rouge">x</code> 看起来有点像一个promise，它会试图使 <code
-      class="highlighter-rouge">promise</code> 采取 <code class="highlighter-rouge">x</code>的状态, 否则, 它会转变
-    <code class="highlighter-rouge">promise</code>的状态为fulfilled并以
-    <code class="highlighter-rouge">x</code>作为value。</p>
-
-  <p id="point-46"><a href="#point-46" class="anchor"></a>这种对thenables的处理使promise的实现更具有可操作性, 只要它们暴露一个Promises/A+应允的<code class="highlighter-rouge">then</code> 方法，它也允许符合Promises/A+的实现与那些具有合理 <code
-      class="highlighter-rouge">then</code> 方法，但不符合规范的实现共存</p>
-
-  <p id="point-47"><a href="#point-47" class="anchor"></a>运行 <code class="highlighter-rouge">[[Resolve]](promise,
-      x)</code>, 会执行以下步骤:</p>
-
-  <ol>
-    <li id="point-48"><a href="#point-48" class="anchor"></a>如果<code class="highlighter-rouge">promise</code> 和<code
-        class="highlighter-rouge">x</code> 指向同一个object, reject<code
-        class="highlighter-rouge">promise</code>,并抛出一个<code class="highlighter-rouge">TypeError</code>作为reason.
-    </li>
-    <li id="point-49"><a href="#point-49" class="anchor"></a>如果 <code class="highlighter-rouge">x</code> 是一个promise,
-      采取它的状态[<a href="#notes">3.4</a>]:
-      <ol>
-        <li id="point-50"><a href="#point-50" class="anchor"></a>如果 <code class="highlighter-rouge">x</code> 的状态是pending,
-          <code class="highlighter-rouge">promise</code> 保持 pending状态，直到 <code
-            class="highlighter-rouge">x</code> 状态转变为 fulfilled 或 rejected.</li>
-        <li id="point-51"><a href="#point-51" class="anchor"></a>如果 <code class="highlighter-rouge">x</code> 状态为
-          fulfilled, fulfill <code class="highlighter-rouge">promise</code>,给一个相同的value.</li>
-        <li id="point-52"><a href="#point-52" class="anchor"></a>如果 <code class="highlighter-rouge">x</code> 状态为
-          rejected, reject <code class="highlighter-rouge">promise</code> ,给一个相同的reason.</li>
-      </ol>
-    </li>
-    <li id="point-53"><a href="#point-53" class="anchor"></a>另外, 如果<code class="highlighter-rouge">x</code> 是一个对象或者函数,
-      <ol>
-        <li id="point-54"><a href="#point-54" class="anchor"></a> 把
-          <code class="highlighter-rouge">x.then</code> 作为<code class="highlighter-rouge">then</code> [<a
-            href="#notes">3.5</a>]</li>
-        <li id="point-55"><a href="#point-55" class="anchor"></a>如果在<code
-            class="highlighter-rouge">x.then</code> 取值过程中抛出一个异常e <code
-            class="highlighter-rouge">e</code>, reject<code class="highlighter-rouge">promise</code>,并把<code
-            class="highlighter-rouge">e</code> 作为reason。</li>
-        <li id="point-56"><a href="#point-56" class="anchor"></a>如果 <code class="highlighter-rouge">then</code> 是一个函数, 用x调用它，并把 <code class="highlighter-rouge">x</code> as <code
-            class="highlighter-rouge">this</code>指向x,并且接收两个参数，第一个参数是 <code class="highlighter-rouge">resolvePromise</code>,
-          第二个参数是 <code class="highlighter-rouge">rejectPromise</code>, 这里:
-          <ol>
-            <li id="point-57"><a href="#point-57" class="anchor"></a>如果 <code
-                class="highlighter-rouge">resolvePromise</code> 被一个value<code
-                class="highlighter-rouge">y</code>调用, 运行<code class="highlighter-rouge">[[Resolve]](promise, y)</code>.
-            </li>
-            <li id="point-58"><a href="#point-58" class="anchor"></a>如果 <code
-                class="highlighter-rouge">rejectPromise</code> 被一个reason <code
-                class="highlighter-rouge">r</code>调用, reject <code class="highlighter-rouge">promise</code> ,并以 <code
-                class="highlighter-rouge">r</code>作为reason.</li>
-            <li id="point-59"><a href="#point-59" class="anchor"></a>如果 <code
-                class="highlighter-rouge">resolvePromise</code> 和<code class="highlighter-rouge">rejectPromise</code>
-              都被调用, 或者被相同的参数多次调用, 采取第一次调用的结果,忽略之后的调用。</li>
-            <li id="point-60"><a href="#point-60" class="anchor"></a>如果调用<code
-                class="highlighter-rouge">then</code> 的时候抛出一个异常<code class="highlighter-rouge">e</code>,
-              <ol>
-                <li id="point-61"><a href="#point-61" class="anchor"></a>如果 <code
-                    class="highlighter-rouge">resolvePromise</code> 或者 <code
-                    class="highlighter-rouge">rejectPromise</code> 已经被调用, 忽略这个异常。</li>
-                <li id="point-62"><a href="#point-62" class="anchor"></a>否则， reject<code
-                    class="highlighter-rouge">promise</code>, 并把 <code class="highlighter-rouge">e</code>作为
-                  reason.</li>
-              </ol>
-            </li>
-          </ol>
-        </li>
-        <li id="point-63"><a href="#point-63" class="anchor"></a>如果<code class="highlighter-rouge">then</code> 不是一个函数， resolve<code class="highlighter-rouge">promise</code> ,并把 <code
-            class="highlighter-rouge">x</code>作为value。</li>
-      </ol>
-    </li>
-    <li id="point-64"><a href="#point-64" class="anchor"></a>如果 <code class="highlighter-rouge">x</code> 
-      既不是一个对象也不是一个函数, fulfill <code class="highlighter-rouge">promise</code> ,并把 <code
-        class="highlighter-rouge">x</code>作为value。</li>
-  </ol>
-
-  <p id="point-65"><a href="#point-65" class="anchor"></a>如果一个promise被一个参与了循环的thenable链的thenable,resolved
-    , 这样 <code class="highlighter-rouge">[[Resolve]](promise,
-      thenable)</code> 的递归本质会使<code class="highlighter-rouge">[[Resolve]](promise, thenable)</code> 再次被调用, 遵循以上的算法会导致无限递归. 
-    我们鼓励但不强制实现, 去检测在出现这种无限递归时,用一个
-    <code class="highlighter-rouge">TypeError</code> 作为reason去reject <code class="highlighter-rouge">promise</code>[<a
-      href="#notes">3.6</a>]</p>
-
-  <h2 id="notes"><a href="#notes" class="anchor"></a>注释</h2>
-
-  <ol>
-    <li id="point-66"><a href="#point-66" class="anchor"></a>
-      <p id="point-67"><a href="#point-67" class="anchor"></a>这里 “平台代码” 是指 引擎, 环境, 和
-        promise 实现代码. 在实践中, 需要保证 <code
-          class="highlighter-rouge">onFulfilled</code> 和 <code class="highlighter-rouge">onRejected</code>是异步执行的
-        , 并且应该在<code class="highlighter-rouge">then</code> 被调用的那一轮事件环结束后, 采用一个新的栈来调用， 可以采用宏任务（’macro-task‘）机制如 <a
-          href="https://html.spec.whatwg.org/multipage/webappapis.html#timers"><code
-            class="highlighter-rouge">setTimeout</code></a> 、<a
-          href="https://dvcs.w3.org/hg/webperf/raw-file/tip/specs/setImmediate/Overview.html#processingmodel"><code
-            class="highlighter-rouge">setImmediate</code></a>, 或者微任务（“micro-task” ）机制如 <a
-          href="https://dom.spec.whatwg.org/#interface-mutationobserver"><code
-            class="highlighter-rouge">MutationObserver</code></a> 、<a
-          href="https://nodejs.org/api/process.html#process_process_nexttick_callback"><code
-            class="highlighter-rouge">process.nextTick</code></a>来实现。 由于 promise 的实现被认为是
-        平台代码, 它处理程序时可能本身包含一个任务队列 或者 “trampoline”。
-      </p>
-    </li>
-    <li id="point-68"><a href="#point-68" class="anchor"></a>
-      <p id="point-69"><a href="#point-69" class="anchor"></a>也就是说, 在严格模式下 <code
-          class="highlighter-rouge">this</code> 是 <code class="highlighter-rouge">undefined</code>;
-        非严格模式下, this指向全局对象。</p>
-    </li>
-    <li id="point-70"><a href="#point-70" class="anchor"></a>
-      <p id="point-71"><a href="#point-71" class="anchor"></a>在实现满足所有要求的情况下，可以允许 <code
-          class="highlighter-rouge">promise2 === promise1</code>, 每一种实现都应该记录是否可以让
-       <code class="highlighter-rouge">promise2 ===
-          promise1</code> ，以及什么情况下等式成立。</p>
-    </li>
-    <li id="point-72"><a href="#point-72" class="anchor"></a>
-      <p id="point-73"><a href="#point-73" class="anchor"></a>一般来说，只有x符合当前实现,我们才认为它是一个真正的 <code
-          class="highlighter-rouge">x</code> 。这个条款允许具体实现的时候可以采用一个符合规范的promise的状态。</p>
-    </li>
-    <li id="point-74"><a href="#point-74" class="anchor"></a>
-      <p id="point-75"><a href="#point-75" class="anchor"></a>程序会首先 存储的一个 <code
-          class="highlighter-rouge">x.then</code>的引用地址, 然后测试这个引用, 然后调用这个引用,
-          避免多次调用<code class="highlighter-rouge">x.then</code> 属性。这种防范
-        对确保值的一致性非常重要，因为在面对一个存储器属性时, 在取值的时候值可能发生改变</p>
-    </li>
-    <li id="point-76"><a href="#point-76" class="anchor"></a>
-      <p id="point-77"><a href="#point-77" class="anchor"></a>实现不需要专门针对深度的tenable链做限制, 假定超出了这个限制的递归就是无限的。
-        只有真正的循环引用才会导致 <code class="highlighter-rouge">TypeError</code>; 如果一个无限的链上的
-        thenables都互不相同, 递归永远是正确的行为。</p>
-    </li>
-  </ol>
-
-  <hr>
-
-  <p xmlns:dct="http://purl.org/dc/terms/" xmlns:vcard="http://www.w3.org/2001/vcard-rdf/3.0#" id="point-78"><a
-      href="#point-78" class="anchor"></a>
-    <a rel="license" href="https://creativecommons.org/publicdomain/zero/1.0/">
-      <img src="https://i.creativecommons.org/p/zero/1.0/88x31.png" style="border-style: none;" alt="CC0">
-    </a>
-    <br>
-    To the extent possible under law,
-    <a rel="dct:publisher" href="https://github.com/promises-aplus">
-      <span property="dct:title">the Promises/A+ organization</span></a>
-    has waived all copyright and related or neighboring rights to
-    <span property="dct:title">Promises/A+ Promise Specification</span>.
-    This work is published from:
-    <span property="vcard:Country" datatype="dct:ISO3166" content="US" about="https://github.com/promises-aplus">
-      United States</span>.
-  </p>
-  <footer>
-    <a href="/">Specification</a>
-    <a href="/changelog">Changelog</a>
-    <a href="/credits">Credits</a>
-    <a href="/differences-from-promises-a">Differences from Promises/A</a>
-    <a href="/implementations">Implementations</a>
-    <a href="https://github.com/promises-aplus/promises-tests">Compliance Tests</a>
-    <a href="https://github.com/promises-aplus">GitHub organization</a>
-  </footer>
-  <script src="assets/linker.js"></script>
+ Specification Changelog Credits Differences from Promises/A Implementations Compliance Tests GitHub organization
 </body>
 
 </html>
