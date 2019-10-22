@@ -1,11 +1,12 @@
 ### 1.promise中文翻译
 #### 请访问https://jiajiafan.github.io/promise/.
 ### 2.promise 源码实现
-```javascript
+```
 const PENDING = "PENDING";
 const FULFILLED = "FULFILLED";
 const REJECTED = "REJECTED";
-const isPromise = (obj) => {
+const **isPromise** = (obj) => {
+  //判断一个对象是否是promise
     if ((typeof obj === 'object' && obj !== null) || typeof obj === 'function') {
         return typeof obj.then ==='function'
     } else {
@@ -45,7 +46,7 @@ function resolvePromise(promise2, x, resolve, reject) {
             resolve(x) 
     }
 }
-class Promise{
+class **Promise**{
     constructor(executor) {
         this.value = undefined;
         this.reason = undefined;
@@ -189,4 +190,3 @@ class Promise{
 
 }
 ```
--
