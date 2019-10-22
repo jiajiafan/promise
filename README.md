@@ -1,6 +1,6 @@
-### promise中文翻译
-#### https://jiajiafan.github.io/promise/.
-### promise 源码实现
+### 1.promise中文翻译
+#### 请访问https://jiajiafan.github.io/promise/.
+### 2.promise 源码实现
 ```javascript
 const PENDING = "PENDING";
 const FULFILLED = "FULFILLED";
