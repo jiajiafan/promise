@@ -1,4 +1,5 @@
-### promise
-- Bulleted中文
-- Bulleted翻译
+### promise中文翻译
+```javascript
+let promise
+```
 -
