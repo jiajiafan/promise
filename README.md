@@ -1,6 +1,6 @@
 ### 1.promise中文翻译
 #### 请访问https://jiajiafan.github.io/promise/.
-### 2.promise 源码实现
+### 2.promise 实现
 ``` javascript
 const PENDING = "PENDING";
 const FULFILLED = "FULFILLED";
